@@ -1,5 +1,7 @@
 package com.alexecollins.openbookmaker.sports;
 
+import com.alexecollins.openbookmaker.sports.model.Price;
+import com.alexecollins.openbookmaker.sports.model.PriceStrategy;
 import lombok.NonNull;
 
 import java.util.Date;

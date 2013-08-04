@@ -1,8 +1,9 @@
-package com.alexecollins.openbookmaker.sports;
+package com.alexecollins.openbookmaker.sports.model;
 
 import lombok.Data;
 import lombok.NonNull;
 
+import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import java.util.Map;
  * @author alexec (alex.e.c@gmail.com)
  */
 @Data(staticConstructor = "of")
-public class Outcome {
+public class Outcome implements Serializable {
 	@NonNull
 	private final Market outcome;
 	@NonNull

@@ -5,10 +5,10 @@ import org.junit.Before;
 /**
  * @author alexec (alex.e.c@gmail.com)
  */
-public class CustTest {
+public class CustomerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Cust.of("alex");
+		Customer.of("alex");
 	}
 }

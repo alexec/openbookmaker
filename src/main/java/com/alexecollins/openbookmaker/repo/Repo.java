@@ -15,7 +15,6 @@ public class Repo<T extends Serializable> {
 	}
 
 	public Repo(File dir) {
-		if (dir == null) {throw new IllegalArgumentException();}
 		this.dir = dir;
 	}
 

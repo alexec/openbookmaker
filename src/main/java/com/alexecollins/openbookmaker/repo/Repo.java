@@ -1,7 +1,5 @@
 package com.alexecollins.openbookmaker.repo;
 
-import lombok.NonNull;
-
 import java.io.*;
 import java.util.UUID;
 
@@ -10,7 +8,6 @@ import java.util.UUID;
  */
 public class Repo<T extends Serializable> {
 
-	@NonNull
 	private final File dir;
 
 	public Repo() {
@@ -18,6 +15,7 @@ public class Repo<T extends Serializable> {
 	}
 
 	public Repo(File dir) {
+		if (dir == null) {throw new IllegalArgumentException();}
 		this.dir = dir;
 	}
 

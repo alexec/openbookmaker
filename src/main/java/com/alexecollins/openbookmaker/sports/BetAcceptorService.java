@@ -8,6 +8,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author alexec (alex.e.c@gmail.com)
@@ -15,6 +16,7 @@ import java.io.IOException;
 @Slf4j
 public class BetAcceptorService implements MessageListener {
 
+	private final AtomicLong processed = new AtomicLong();
 	private final Repo<BetPlacement> repo;
 	private final QueueConnection topicConnection;
 	private final Queue topic;
@@ -64,6 +66,12 @@ public class BetAcceptorService implements MessageListener {
 			log.info("committed " + placement.getUuid());
 		} catch (JMSException | IOException e) {
 			log.warn("failed to process " + message);
+		} finally {
+			processed.incrementAndGet();
 		}
+	}
+
+	public long getProcessed() {
+		return processed.get();
 	}
 }

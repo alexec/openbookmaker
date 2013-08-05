@@ -12,11 +12,6 @@ import java.util.Currency;
  * @author alexec (alex.e.c@gmail.com)
  */
 public class BetPlacementServiceIT extends AbstractBetPlacementServiceTest {
-
-	public BetPlacementServiceIT() {
-		super();
-	}
-
 	@Test
 	public void load() throws Exception {
 		final Account acct = Account.of(Customer.of("alex"), Currency.getInstance("GBP"));
@@ -31,10 +26,19 @@ public class BetPlacementServiceIT extends AbstractBetPlacementServiceTest {
 				sut.place(BetPlacement.of(acct, Bet.of(Arrays.asList(Leg.of(Arrays.asList(Part.of(outcome, StrikePriceStrategy.of(outcome.getPrices().get(Price.Type.LIVE)))))))));
 				n++;
 			}
-			System.out.println("placed " + n + " bets...");
+			System.out.println("placed " + n + " bets, " + acceptor.getProcessed() + " accepted");
 
 		}
 		final long t = System.currentTimeMillis() - start;
 		System.out.println("placed " + n + " in " + t +"ms, " + (n*1000/t) +" bets/sec");
+
+		while (acceptor.getProcessed() < n) {
+			System.out.println("waiting for acceptance to complete...");
+			Thread.sleep(500);
+		}
+
+		final long t2 = System.currentTimeMillis() - start;
+		System.out.println("acceptance in " + t2 +"ms, " + (n*1000/t2) +" bets/sec");
+
 	}
 }

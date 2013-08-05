@@ -12,9 +12,10 @@ import java.util.Map;
  */
 @Data(staticConstructor = "of")
 public class Outcome implements Serializable {
+	private final long id;
 	@NonNull
-	private final Market outcome;
+	private final Market market;
 	@NonNull
-	private final Map<Price.Type,Price> prices = new EnumMap<Price.Type, Price>(Price.Type.class);
+	private final Map<Price.Type,Price> prices = new EnumMap<>(Price.Type.class);
 
 }

@@ -15,5 +15,5 @@ public class Price implements Serializable {
 	}
 
 	@NonNull
-	private short num, den;
+	private int num, den;
 }

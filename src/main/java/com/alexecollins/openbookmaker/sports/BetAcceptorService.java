@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -14,7 +15,7 @@ import java.io.IOException;
 @Slf4j
 public class BetAcceptorService implements MessageListener {
 
-	private final Repo<BetPlacement> repo = new Repo<>();
+	private final Repo<BetPlacement> repo;
 	private final QueueConnection topicConnection;
 	private final Queue topic;
 	private final ThreadLocal<QueueSession> session = new ThreadLocal<QueueSession>() {
@@ -28,22 +29,15 @@ public class BetAcceptorService implements MessageListener {
 		}
 	};
 
-	public BetAcceptorService() throws NamingException, JMSException {
+	public BetAcceptorService(File repoDir) throws NamingException, JMSException {
 		final InitialContext ctx = new InitialContext();
 
 		topicConnection = ((QueueConnectionFactory) ctx.lookup("ConnectionFactory")).createQueueConnection();
 		topic = (Queue) ctx.lookup("Bets");
+
+		repo = new Repo<>(repoDir);
 	}
 
-	public static void main(String[] args) throws Exception {
-		final BetAcceptorService acceptor = new BetAcceptorService();
-		acceptor.start();
-		acceptor.await();
-	}
-
-	public void await() throws InterruptedException {
-		Thread.sleep(Long.MAX_VALUE);
-	}
 
 	public void start() throws JMSException {
 		session.get().createReceiver(topic).setMessageListener(this);

@@ -9,5 +9,5 @@ import java.io.Serializable;
  */
 @Data(staticConstructor = "of")
 public class Event implements Serializable {
-
+	private final long id;
 }

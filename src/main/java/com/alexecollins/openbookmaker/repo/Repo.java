@@ -10,10 +10,6 @@ public class Repo<T extends Serializable> {
 
 	private final File dir;
 
-	public Repo() {
-		this.dir = new File(".");
-	}
-
 	public Repo(File dir) {
 		this.dir = dir;
 	}

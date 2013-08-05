@@ -10,5 +10,6 @@ import java.io.Serializable;
  */
 @Data(staticConstructor = "of")
 public class Market implements Serializable{
+	private final long id;
 	@NonNull private final Event event;
 }

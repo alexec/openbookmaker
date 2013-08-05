@@ -2,4 +2,6 @@
 *.iml
 /activemq-data
 /target
+/openbookmaker
 /*.ser
+/derby.log

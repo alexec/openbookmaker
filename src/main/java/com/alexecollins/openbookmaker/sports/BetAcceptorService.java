@@ -4,10 +4,10 @@ import com.alexecollins.openbookmaker.repo.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.jms.*;
-import javax.naming.NamingException;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,36 +19,10 @@ public class BetAcceptorService implements MessageListener {
 
 	private final AtomicLong processed = new AtomicLong();
 	private final Repo<BetPlacement> repo;
-	private final QueueConnection topicConnection;
-	private final Queue betQueue;
-	private final ThreadLocal<QueueSession> session = new ThreadLocal<QueueSession>() {
-		@Override
-		protected QueueSession initialValue() {
-			try {
-				return topicConnection.createQueueSession(false, TopicSession.AUTO_ACKNOWLEDGE);
-			} catch (JMSException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	};
 
 	@Autowired
-	public BetAcceptorService(Repo<BetPlacement> betPlacementRepo, QueueConnectionFactory topicConnection, Queue betQueue) throws NamingException, JMSException {
+	public BetAcceptorService(Repo<BetPlacement> betPlacementRepo) {
 		this.repo = betPlacementRepo;
-		this.topicConnection = topicConnection.createQueueConnection();
-		this.betQueue = betQueue;
-	}
-
-	@PostConstruct
-	public void start() throws JMSException {
-		session.get().createReceiver(betQueue).setMessageListener(this);
-		topicConnection.start();
-	}
-
-	@PreDestroy
-	public void stop() throws JMSException {
-		topicConnection.stop();
-		topicConnection.close();
 	}
 
 	@Override
@@ -65,6 +39,7 @@ public class BetAcceptorService implements MessageListener {
 			repo.add(placement.getUuid(), placement);
 
 			log.info("committed " + placement.getUuid());
+
 		} catch (JMSException | IOException e) {
 			log.warn("failed to process " + message);
 		} finally {

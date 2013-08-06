@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd   http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd   http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+       http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.0.xsd">
 
     <context:annotation-config/>
-    
-    <jee:jndi-lookup id="queueConnectionFactory" jndi-name="ConnectionFactory" expected-type="javax.jms.QueueConnectionFactory"/>
+
+    <jee:jndi-lookup id="queueConnectionFactory" jndi-name="ConnectionFactory"
+                     expected-type="javax.jms.QueueConnectionFactory"/>
     <jee:jndi-lookup id="bets" jndi-name="Bets" expected-type="javax.jms.Queue"/>
+    <!--
+    <jee:jndi-lookup id="acceptedBets" jndi-name="AcceptedBets" expected-type="javax.jms.Queue"/>
+    -->
+
+    <bean id="cachedConnectionFactory"
+          class="org.springframework.jms.connection.CachingConnectionFactory"
+          p:targetConnectionFactory-ref="queueConnectionFactory" p:sessionCacheSize="10"/>
+
+    <bean id="producerTemplate" class="org.springframework.jms.core.JmsTemplate"
+          p:connectionFactory-ref="cachedConnectionFactory"
+          p:defaultDestination-ref="bets"/>
+
+    <jms:listener-container container-type="default"
+                            connection-factory="queueConnectionFactory"
+                            acknowledge="auto">
+        <jms:listener destination="#{bets['queueName']}" ref="betAcceptorService"/>
+    </jms:listener-container>
+
 
     <bean id="betPlacementRepo" class="com.alexecollins.openbookmaker.repo.Repo">
         <constructor-arg value="#{systemProperties['java.io.tmpdir']}"/>
@@ -16,7 +39,7 @@
 
     <bean class="com.alexecollins.openbookmaker.sports.PropositionService"/>
     <bean class="com.alexecollins.openbookmaker.sports.BetPlacementService"/>
-    <bean class="com.alexecollins.openbookmaker.sports.BetAcceptorService"/>
+    <bean id="betAcceptorService" class="com.alexecollins.openbookmaker.sports.BetAcceptorService"/>
     <bean class="com.alexecollins.openbookmaker.sports.LiabilityService"/>
 
 </beans>

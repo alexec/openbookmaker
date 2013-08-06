@@ -19,4 +19,6 @@ public abstract class AbstractTest {
 	protected BetPlacementService betPlacementService;
 	@Autowired
 	protected BetAcceptorService betAcceptorService;
+	@Autowired
+	protected LiabilityService liabilityService;
 }

@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @author alexec (alex.e.c@gmail.com)
@@ -16,4 +17,8 @@ public class Price implements Serializable {
 
 	@NonNull
 	private int num, den;
+
+	public BigDecimal getValue() {
+		return BigDecimal.valueOf(num).divide(BigDecimal.valueOf(den));
+	}
 }

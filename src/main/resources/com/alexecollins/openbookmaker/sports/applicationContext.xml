@@ -11,27 +11,36 @@
 
     <context:annotation-config/>
 
-    <jee:jndi-lookup id="queueConnectionFactory" jndi-name="ConnectionFactory"
+    <jee:jndi-lookup id="queueConnectionFactory" jndi-name="queueConnectionFactory"
                      expected-type="javax.jms.QueueConnectionFactory"/>
+    <jee:jndi-lookup id="topicConnectionFactory" jndi-name="topicConnectionFactory"
+                     expected-type="javax.jms.TopicConnectionFactory"/>
     <jee:jndi-lookup id="bets" jndi-name="Bets" expected-type="javax.jms.Queue"/>
-    <!--
-    <jee:jndi-lookup id="acceptedBets" jndi-name="AcceptedBets" expected-type="javax.jms.Queue"/>
-    -->
+    <jee:jndi-lookup id="acceptedBets" jndi-name="AcceptedBets" expected-type="javax.jms.Topic"/>
 
     <bean id="cachedConnectionFactory"
           class="org.springframework.jms.connection.CachingConnectionFactory"
           p:targetConnectionFactory-ref="queueConnectionFactory" p:sessionCacheSize="10"/>
 
-    <bean id="producerTemplate" class="org.springframework.jms.core.JmsTemplate"
+    <bean id="betJmsTemplate" class="org.springframework.jms.core.JmsTemplate"
           p:connectionFactory-ref="cachedConnectionFactory"
           p:defaultDestination-ref="bets"/>
 
     <jms:listener-container container-type="default"
-                            connection-factory="queueConnectionFactory"
+                            connection-factory="cachedConnectionFactory"
                             acknowledge="auto">
-        <jms:listener destination="#{bets['queueName']}" ref="betAcceptorService"/>
+        <jms:listener destination="#{bets['queueName']}" ref="betAcceptorService" />
     </jms:listener-container>
 
+    <bean id="acceptedBetsJmsTemplate" class="org.springframework.jms.core.JmsTemplate"
+          p:connectionFactory-ref="cachedConnectionFactory"
+          p:defaultDestination-ref="acceptedBets" p:pubSubDomain="true"/>
+
+    <jms:listener-container container-type="default"
+                            connection-factory="cachedConnectionFactory"
+                            acknowledge="auto" destination-type="topic">
+        <jms:listener destination="#{acceptedBets['topicName']}" ref="liabilityService"/>
+    </jms:listener-container>
 
     <bean id="betPlacementRepo" class="com.alexecollins.openbookmaker.repo.Repo">
         <constructor-arg value="#{systemProperties['java.io.tmpdir']}"/>
@@ -40,6 +49,6 @@
     <bean class="com.alexecollins.openbookmaker.sports.PropositionService"/>
     <bean class="com.alexecollins.openbookmaker.sports.BetPlacementService"/>
     <bean id="betAcceptorService" class="com.alexecollins.openbookmaker.sports.BetAcceptorService"/>
-    <bean class="com.alexecollins.openbookmaker.sports.LiabilityService"/>
+    <bean id="liabilityService" class="com.alexecollins.openbookmaker.sports.LiabilityService"/>
 
 </beans>

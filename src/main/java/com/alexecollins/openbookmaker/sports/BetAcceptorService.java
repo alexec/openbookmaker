@@ -3,11 +3,11 @@ package com.alexecollins.openbookmaker.sports;
 import com.alexecollins.openbookmaker.repo.Repo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.ObjectMessage;
+import javax.jms.*;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,26 +19,37 @@ public class BetAcceptorService implements MessageListener {
 
 	private final AtomicLong processed = new AtomicLong();
 	private final Repo<BetPlacement> repo;
+	private final JmsTemplate jmsTemplate;
 
 	@Autowired
-	public BetAcceptorService(Repo<BetPlacement> betPlacementRepo) {
+	public BetAcceptorService(Repo<BetPlacement> betPlacementRepo, @Qualifier("acceptedBetsJmsTemplate") JmsTemplate jmsTemplate) {
 		this.repo = betPlacementRepo;
+		this.jmsTemplate = jmsTemplate;
 	}
 
 	@Override
 	public void onMessage(Message message) {
 		log.info("processing  " + message);
 
-		final ObjectMessage objectMessage = (ObjectMessage) message;
+		final ObjectMessage placedMessage = (ObjectMessage) message;
 
 		try {
-			final BetPlacement placement = (BetPlacement) objectMessage.getObject();
+			final BetPlacement placement = (BetPlacement) placedMessage.getObject();
 
 			placement.setStatus(BetPlacement.Status.COMMITTED);
 
 			repo.add(placement.getUuid(), placement);
 
 			log.info("committed " + placement.getUuid());
+
+			jmsTemplate.send(new MessageCreator() {
+				@Override
+				public Message createMessage(Session session) throws JMSException {
+					final ObjectMessage accepted = session.createObjectMessage();
+					accepted.setObject(placement);
+					return accepted;
+				}
+			});
 
 		} catch (JMSException | IOException e) {
 			log.warn("failed to process " + message);

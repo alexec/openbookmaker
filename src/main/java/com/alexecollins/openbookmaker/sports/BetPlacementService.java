@@ -1,6 +1,7 @@
 package com.alexecollins.openbookmaker.sports;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
@@ -17,7 +18,7 @@ public class BetPlacementService {
 	private final JmsTemplate jmsTemplate;
 
 	@Autowired
-	public BetPlacementService(JmsTemplate jmsTemplate) {
+	public BetPlacementService(@Qualifier("betJmsTemplate") JmsTemplate jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
 	}
 

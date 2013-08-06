@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author alexec (alex.e.c@gmail.com)
@@ -16,6 +17,7 @@ import java.util.List;
 public class TestEventGenerator {
 	@NonNull
 	private final PropositionService propositionService;
+	private final Random random = new Random();
 
 	@Autowired
 	public TestEventGenerator(PropositionService propositionService) {
@@ -29,7 +31,7 @@ public class TestEventGenerator {
 			final Market market = propositionService.newMarket(event);
 			for (int j=0;j<20;j++) {
 				final Outcome outcome = propositionService.newOutcome(market);
-				outcome.getPrices().put(Price.Type.LIVE, Price.of(1,1));
+				outcome.getPrices().put(Price.Type.LIVE, Price.of(random.nextInt(19)+1,random.nextInt(20)+1));
 			}
 			list.add(event);
 		}

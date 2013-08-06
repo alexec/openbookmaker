@@ -10,6 +10,8 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class LiabilityService implements MessageListener {
 	private final Map<Outcome, AtomicReference<BigDecimal>> liabilities = new ConcurrentHashMap<>();
+	private final MathContext mathContext = new MathContext(2, RoundingMode.HALF_UP);;
 
 	@Override
 	public void onMessage(Message message) {
@@ -42,7 +45,7 @@ public class LiabilityService implements MessageListener {
 			}
 		}
 
-		liability = liability.divide(BigDecimal.valueOf(n));
+		liability = liability.divide(BigDecimal.valueOf(n), mathContext);
 
 		for (Leg leg : placement.getBet().getLegs()) {
 			for (Part part : leg.getParts()) {

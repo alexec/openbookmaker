@@ -3,6 +3,7 @@ package com.alexecollins.openbookmaker.sports;
 import com.alexecollins.openbookmaker.cust.Account;
 import com.alexecollins.openbookmaker.cust.Customer;
 import com.alexecollins.openbookmaker.sports.model.*;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * @author alexec (alex.e.c@gmail.com)
@@ -17,25 +19,37 @@ import java.util.List;
 public class BetPlacementServiceIT extends AbstractBetPlacementServiceTest {
 
 	List<Event> events;
+	private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	ExecutorCompletionService<Void> executorCompletionService = new ExecutorCompletionService<>(executorService);
 
 	@Before
 	public void setUp() throws Exception {
 		events = testEventGenerator.generate(100);
 	}
 
+	@After
+	public void tearDown() throws Exception {
+		executorService.shutdown();
+
+	}
+
 	@Test
 	public void load() throws Exception {
 		final Account acct = Account.of(Customer.of("alex"), Currency.getInstance("GBP"));
-
-
 		int i = 100;
 		int n = 0;
 		final long start = System.currentTimeMillis();
 		while (--i > 0) {
-			for (Event event : events) {
-				final Outcome outcome = propositionService.outcomesByMarket(propositionService.marketsByEvent(event).get(0)).get(0);
+			for (final Event event : events) {
+				executorCompletionService.submit(new Callable<Void>() {
+					@Override
+					public Void call() throws Exception {
+						final Outcome outcome = propositionService.outcomesByMarket(propositionService.marketsByEvent(event).get(0)).get(0);
 
-				betPlacementService.place(BetPlacement.of(acct, Bet.of(Arrays.asList(Leg.of(Arrays.asList(Part.of(outcome, StrikePriceStrategy.of(outcome.getPrices().get(Price.Type.LIVE)))))), BigDecimal.ONE)));
+						betPlacementService.place(BetPlacement.of(acct, Bet.of(Arrays.asList(Leg.of(Arrays.asList(Part.of(outcome, StrikePriceStrategy.of(outcome.getPrices().get(Price.Type.LIVE)))))), BigDecimal.ONE)));
+						return null;
+					}
+				});
 				n++;
 			}
 			System.out.println("placed " + n + " bets, " + betAcceptorService.getProcessed() + " accepted");
@@ -43,6 +57,9 @@ public class BetPlacementServiceIT extends AbstractBetPlacementServiceTest {
 		}
 		final long t = System.currentTimeMillis() - start;
 		System.out.println("placed " + n + " in " + t +"ms, " + (n*1000/t) +" bets/sec");
+		while (--n > 0) {
+			executorCompletionService.take();
+		}
 
 		while (betAcceptorService.getProcessed() < n) {
 			System.out.println("waiting for acceptance to complete...");

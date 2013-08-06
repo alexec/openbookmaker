@@ -52,7 +52,7 @@ public class BetAcceptorService implements MessageListener {
 			});
 
 		} catch (JMSException | IOException e) {
-			log.warn("failed to process " + message);
+			log.warn("failed to process " + message, e);
 		} finally {
 			processed.incrementAndGet();
 		}

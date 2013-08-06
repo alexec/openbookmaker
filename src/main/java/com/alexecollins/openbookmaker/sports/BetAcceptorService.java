@@ -29,12 +29,12 @@ public class BetAcceptorService implements MessageListener {
 
 	@Override
 	public void onMessage(Message message) {
-		log.info("processing  " + message);
 
 		final ObjectMessage placedMessage = (ObjectMessage) message;
 
 		try {
 			final BetPlacement placement = (BetPlacement) placedMessage.getObject();
+			log.info("processing  " + placement.getUuid());
 
 			placement.setStatus(BetPlacement.Status.COMMITTED);
 

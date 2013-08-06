@@ -73,7 +73,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <changeLogFile>src/main/resources/com/alexecollins/openbookmaker/database-core.xml</changeLogFile>
+                    <changeLogFile>src/main/resources/com/alexecollins/openbookmaker/sports/database-core.xml</changeLogFile>
                     <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
                     <url>jdbc:derby:openbookmaker;create=true</url>
                     <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>

@@ -1,7 +1,10 @@
 package com.alexecollins.openbookmaker.sports;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.jms.*;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 /**
@@ -9,8 +12,8 @@ import javax.naming.NamingException;
  */
 public class BetPlacementService {
 
-	private final Queue queue;
 	private final QueueConnection queueConnection;
+	private final Queue betQueue;
 	private final ThreadLocal<QueueSession> session = new ThreadLocal<QueueSession>() {
 		@Override
 		protected QueueSession initialValue() {
@@ -22,11 +25,10 @@ public class BetPlacementService {
 		}
 	};
 
-	public BetPlacementService() throws NamingException, JMSException {
-		InitialContext ctx = new InitialContext();
-
-		queueConnection = ((QueueConnectionFactory) ctx.lookup("ConnectionFactory")).createQueueConnection();
-		queue = (Queue) ctx.lookup("Bets");
+	@Autowired
+	public BetPlacementService(QueueConnectionFactory queueConnection, Queue betQueue) throws NamingException, JMSException {
+		this.queueConnection = queueConnection.createQueueConnection();
+		this.betQueue = betQueue;
 	}
 
 	public void place(final BetPlacement placement) throws BetPlacementFailedException {
@@ -40,7 +42,7 @@ public class BetPlacementService {
 
 		final QueueSender sender;
 		try {
-			sender = session.get().createSender(queue);
+			sender = session.get().createSender(betQueue);
 		} catch (JMSException e) {
 			throw new BetPlacementFailedException(e);
 		}
@@ -59,19 +61,16 @@ public class BetPlacementService {
 
 	}
 
-	public void stop() {
-		try {
-			queueConnection.start();
-		} catch (JMSException e) {
-			throw new RuntimeException(e);
-		}
+	@PostConstruct
+	public void start() throws JMSException {
+		queueConnection.start();
+
 	}
 
-	public void start() {
-		try {
-			queueConnection.stop();
-		} catch (JMSException e) {
-			throw new RuntimeException(e);
-		}
+	@PreDestroy
+	public void stop() throws JMSException {
+		queueConnection.stop();
+		queueConnection.close();
 	}
+
 }

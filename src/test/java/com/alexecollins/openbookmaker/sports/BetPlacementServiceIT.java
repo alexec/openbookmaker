@@ -16,23 +16,24 @@ public class BetPlacementServiceIT extends AbstractBetPlacementServiceTest {
 	public void load() throws Exception {
 		final Account acct = Account.of(Customer.of("alex"), Currency.getInstance("GBP"));
 
+
 		int i = 100;
 		int n = 0;
 		final long start = System.currentTimeMillis();
 		while (--i > 0) {
 			for (Event event : events) {
-				final Outcome outcome = propositions.outcomesByMarket(propositions.marketsByEvent(event).get(0)).get(0);
+				final Outcome outcome = propositionService.outcomesByMarket(propositionService.marketsByEvent(event).get(0)).get(0);
 
-				sut.place(BetPlacement.of(acct, Bet.of(Arrays.asList(Leg.of(Arrays.asList(Part.of(outcome, StrikePriceStrategy.of(outcome.getPrices().get(Price.Type.LIVE)))))))));
+				betPlacementService.place(BetPlacement.of(acct, Bet.of(Arrays.asList(Leg.of(Arrays.asList(Part.of(outcome, StrikePriceStrategy.of(outcome.getPrices().get(Price.Type.LIVE)))))))));
 				n++;
 			}
-			System.out.println("placed " + n + " bets, " + acceptor.getProcessed() + " accepted");
+			System.out.println("placed " + n + " bets, " + betAcceptorService.getProcessed() + " accepted");
 
 		}
 		final long t = System.currentTimeMillis() - start;
 		System.out.println("placed " + n + " in " + t +"ms, " + (n*1000/t) +" bets/sec");
 
-		while (acceptor.getProcessed() < n) {
+		while (betAcceptorService.getProcessed() < n) {
 			System.out.println("waiting for acceptance to complete...");
 			Thread.sleep(500);
 		}

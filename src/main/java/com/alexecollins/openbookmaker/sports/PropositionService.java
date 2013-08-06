@@ -1,4 +1,4 @@
-package com.alexecollins.openbookmaker.repo;
+package com.alexecollins.openbookmaker.sports;
 
 import com.alexecollins.openbookmaker.sports.model.Event;
 import com.alexecollins.openbookmaker.sports.model.Market;
@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author alexec (alex.e.c@gmail.com)
  */
-public class Propositions {
+public class PropositionService {
 
 	private AtomicLong id = new AtomicLong();
 	private final Map<Long,List<Market>> markets = new HashMap<>();

@@ -16,6 +16,6 @@ public class Outcome implements Serializable {
 	@NonNull
 	private final Market market;
 	@NonNull
-	private final Map<Price.Type,Price> prices = new EnumMap<>(Price.Type.class);
+	private final Map<Price.Type, Price> prices = new EnumMap<>(Price.Type.class);
 
 }

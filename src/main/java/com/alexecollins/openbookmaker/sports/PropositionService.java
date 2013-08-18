@@ -15,9 +15,10 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class PropositionService {
 
-	private AtomicLong id = new AtomicLong();
-	private final Map<Long,List<Market>> markets = new HashMap<>();
-	private final Map<Long,List<Outcome>> outcomes = new HashMap<>();
+	private final AtomicLong id = new AtomicLong();
+	private final Map<Long, List<Market>> markets = new HashMap<>();
+	private final Map<Long, List<Outcome>> outcomes = new HashMap<>();
+
 
 	public Event newEvent() {
 		return Event.of(id.getAndIncrement());
@@ -25,14 +26,18 @@ public class PropositionService {
 
 	public Market newMarket(Event event) {
 		final Market market = Market.of(id.getAndIncrement(), event);
-		if (!markets.containsKey(event.getId())) {markets.put(event.getId(), new ArrayList<Market>());}
+		if (!markets.containsKey(event.getId())) {
+			markets.put(event.getId(), new ArrayList<Market>());
+		}
 		markets.get(event.getId()).add(market);
 		return market;
 	}
 
 	public Outcome newOutcome(Market market) {
 		final Outcome outcome = Outcome.of(id.getAndIncrement(), market);
-		if (!outcomes.containsKey(market.getId())) {outcomes.put(market.getId(), new ArrayList<Outcome>());}
+		if (!outcomes.containsKey(market.getId())) {
+			outcomes.put(market.getId(), new ArrayList<Outcome>());
+		}
 		outcomes.get(market.getId()).add(outcome);
 		return outcome;
 	}

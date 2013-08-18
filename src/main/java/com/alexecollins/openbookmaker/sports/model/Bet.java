@@ -12,6 +12,8 @@ import java.util.List;
  */
 @Data(staticConstructor = "of")
 public class Bet implements Serializable {
-	@NonNull private final List<Leg> legs;
-	@NonNull private final BigDecimal stake;
+	@NonNull
+	private final List<Leg> legs;
+	@NonNull
+	private final BigDecimal stake;
 }

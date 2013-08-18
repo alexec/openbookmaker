@@ -1,11 +1,14 @@
 package com.alexecollins.openbookmaker.repo;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.*;
 import java.util.UUID;
 
 /**
  * @author alexec (alex.e.c@gmail.com)
  */
+@Slf4j
 public class Repo<T extends Serializable> {
 
 	private final File dir;
@@ -15,6 +18,7 @@ public class Repo<T extends Serializable> {
 	}
 
 	public void add(UUID uuid, T placement) throws IOException {
+		log.info("saving {} as {}", uuid, placement);
 		final File name = fileOf(uuid);
 		try (final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(name))) {
 			out.writeObject(placement);

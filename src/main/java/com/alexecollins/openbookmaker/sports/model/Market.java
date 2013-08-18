@@ -9,7 +9,8 @@ import java.io.Serializable;
  * @author alexec (alex.e.c@gmail.com)
  */
 @Data(staticConstructor = "of")
-public class Market implements Serializable{
+public class Market implements Serializable {
 	private final long id;
-	@NonNull private final Event event;
+	@NonNull
+	private final Event event;
 }

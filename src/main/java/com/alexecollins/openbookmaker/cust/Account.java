@@ -11,6 +11,8 @@ import java.util.Currency;
  */
 @Data(staticConstructor = "of")
 public class Account implements Serializable {
-	@NonNull private final Customer customer;
-	@NonNull private final Currency currency;
+	@NonNull
+	private final Customer customer;
+	@NonNull
+	private final Currency currency;
 }

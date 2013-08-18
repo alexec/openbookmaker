@@ -5,8 +5,8 @@ import com.alexecollins.openbookmaker.sports.model.Market;
 import com.alexecollins.openbookmaker.sports.model.Outcome;
 import com.alexecollins.openbookmaker.sports.model.Price;
 import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -19,7 +19,7 @@ public class TestEventGenerator {
 	private final PropositionService propositionService;
 	private final Random random = new Random();
 
-	@Autowired
+	@Inject
 	public TestEventGenerator(PropositionService propositionService) {
 		this.propositionService = propositionService;
 	}

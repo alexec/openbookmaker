@@ -1,37 +1,31 @@
 package com.alexecollins.openbookmaker.sports;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
+
+import com.alexecollins.openbookmaker.jms.JmsQueueTemplate;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
 
 /**
  * @author alexec (alex.e.c@gmail.com)
  */
+@Slf4j
 public class BetPlacementService {
 
-	private final JmsTemplate jmsTemplate;
+	private final JmsQueueTemplate jmsTemplate;
 
-	@Autowired
-	public BetPlacementService(@Qualifier("betJmsTemplate") JmsTemplate jmsTemplate) {
+	public BetPlacementService(JmsQueueTemplate jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
 	}
 
 	public void place(final BetPlacement placement) throws BetPlacementFailedException {
+		log.info("placing {}", placement);
 
-		jmsTemplate.send(new MessageCreator() {
-			@Override
-			public Message createMessage(Session session) throws JMSException {
-				final ObjectMessage objectMessage = session.createObjectMessage();
-				objectMessage.setObject(placement);
-				return objectMessage;
-			}
-		});
+		try {
+			jmsTemplate.send(placement);
+		} catch (JMSException e) {
+			throw new BetPlacementFailedException(e);
+		}
 
 		placement.setStatus(BetPlacement.Status.PENDING);
 

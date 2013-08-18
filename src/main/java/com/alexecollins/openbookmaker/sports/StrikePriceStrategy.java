@@ -9,10 +9,13 @@ import lombok.NonNull;
  */
 public class StrikePriceStrategy implements PriceStrategy {
 
-	@NonNull private final Price price;
+	@NonNull
+	private final Price price;
 
 	private StrikePriceStrategy(Price price) {
-		if (price == null) {throw new IllegalArgumentException();}
+		if (price == null) {
+			throw new IllegalArgumentException();
+		}
 		this.price = price;
 	}
 

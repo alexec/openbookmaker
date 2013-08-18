@@ -10,6 +10,8 @@ import java.io.Serializable;
  */
 @Data(staticConstructor = "of")
 public class Customer implements Serializable {
-	@NonNull private final String uname;
-	@NonNull private String passwd = null;
+	@NonNull
+	private final String uname;
+	@NonNull
+	private String passwd = null;
 }

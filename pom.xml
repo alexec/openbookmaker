@@ -10,7 +10,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.2.2.RELEASE</spring.version>
     </properties>
 
     <build>
@@ -44,22 +43,13 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.5.2</version>
-                <executions>
-                    <execution>
-                        <goals><goal>check</goal></goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
             <plugin>
                 <groupId>org.apache.activemq.tooling</groupId>
                 <artifactId>maven-activemq-plugin</artifactId>
                 <version>5.7.0</version>
+                <configuration>
+                    <configUri>broker:(tcp://localhost:61616)?useJmx=true&amp;persistent=false</configUri>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.liquibase</groupId>
@@ -97,6 +87,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.squareup.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.dagger</groupId>
+            <artifactId>dagger-compiler</artifactId>
+            <version>1.1.0</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>jms-api</artifactId>
             <version>1.1-rev-1</version>
@@ -107,25 +108,9 @@
             <version>1.6.6</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jms</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

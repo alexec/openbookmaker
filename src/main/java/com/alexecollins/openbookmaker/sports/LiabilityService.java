@@ -22,10 +22,11 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class LiabilityService implements MessageListener {
 	private final Map<Outcome, AtomicReference<BigDecimal>> liabilities = new ConcurrentHashMap<>();
-	private final MathContext mathContext = new MathContext(2, RoundingMode.HALF_UP);;
+	private final MathContext mathContext = new MathContext(2, RoundingMode.HALF_UP);
 
 	@Override
 	public void onMessage(Message message) {
+		log.info("accepting message");
 		BetPlacement placement;
 		try {
 			placement = (BetPlacement) ((ObjectMessage) message).getObject();
@@ -33,7 +34,7 @@ public class LiabilityService implements MessageListener {
 			throw new RuntimeException(e);
 		}
 
-		log.info("recomputing liabilities for bet " + placement.getUuid());
+		log.info("recomputing liabilities for bet {}", placement.getUuid());
 
 		BigDecimal liability = placement.getBet().getStake();
 		int n = 0;
@@ -57,10 +58,10 @@ public class LiabilityService implements MessageListener {
 
 				BigDecimal oldVal;
 				do {
-					 oldVal = newSum.get();
+					oldVal = newSum.get();
 				} while (!newSum.compareAndSet(oldVal, oldVal.add(liability)));
 
-				log.info("liability on " + outcome + " is " + liabilities.get(outcome));
+				log.info("liability on {} is {}", outcome, liabilities.get(outcome));
 			}
 		}
 	}

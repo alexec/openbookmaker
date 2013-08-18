@@ -1,24 +1,36 @@
 package com.alexecollins.openbookmaker.sports;
 
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import com.alexecollins.openbookmaker.LifeCycleManager;
+import dagger.ObjectGraph;
+import org.junit.After;
+import org.junit.Before;
+
+import javax.inject.Inject;
+
 
 /**
  * @author alexec (alex.e.c@gmail.com)
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/com/alexecollins/openbookmaker/sports/applicationContext.xml","classpath:/com/alexecollins/openbookmaker/sports/applicationContext-test.xml"})
 public abstract class AbstractTest {
-	@Autowired
-	protected PropositionService propositionService;
-	@Autowired
-	protected TestEventGenerator testEventGenerator;
-	@Autowired
-	protected BetPlacementService betPlacementService;
-	@Autowired
-	protected BetAcceptorService betAcceptorService;
-	@Autowired
-	protected LiabilityService liabilityService;
+	@Inject
+	LifeCycleManager lifeCycleManager;
+	@Inject
+	TestEventGenerator testEventGenerator;
+	@Inject
+	OpenSportsBookApp app;
+	@Inject
+	BetPlacementService betPlacementService;
+
+	@Before
+	public void setUp() throws Exception {
+		ObjectGraph graph;
+		graph = ObjectGraph.create(new TestModule());
+		graph.inject(this);
+		lifeCycleManager.start();
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		lifeCycleManager.stop();
+	}
 }

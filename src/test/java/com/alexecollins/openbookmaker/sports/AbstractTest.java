@@ -20,6 +20,10 @@ public abstract class AbstractTest {
 	OpenSportsBookApp app;
 	@Inject
 	BetPlacementService betPlacementService;
+	@Inject
+	PropositionService propositionService;
+	@Inject
+	BetAcceptorService betAcceptorService;
 
 	@Before
 	public void setUp() throws Exception {

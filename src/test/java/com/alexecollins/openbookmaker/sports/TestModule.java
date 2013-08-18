@@ -7,10 +7,8 @@ import dagger.Provides;
  * @author alexec (alex.e.c@gmail.com)
  */
 @Module(
-		injects = {AbstractTest.class, BetPlacementServiceTest.class},
-		includes = {OpenbookmakerModule.class},
-		library = true
-
+		injects = {AbstractTest.class, BetPlacementServiceTest.class, BetPlacementServiceIT.class},
+		includes = {OpenbookmakerModule.class}
 )
 public class TestModule {
 
